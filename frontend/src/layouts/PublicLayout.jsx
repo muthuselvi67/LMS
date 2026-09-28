@@ -29,18 +29,7 @@ export const PublicLayout = () => {
             {/* Column 1: Brand & Tagline */}
             <div>
               <div className="flex items-center gap-2" style={{ marginBottom: '1rem' }}>
-                <div style={{
-                  background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
-                  color: '#fff',
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '8px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <span style={{ fontWeight: 900, fontSize: '1rem', letterSpacing: '-0.05em', lineHeight: 1 }}>LL</span>
-                </div>
+
                 <span style={{ fontWeight: 800, fontSize: '1.25rem', color: 'var(--text-main)' }}>
                   Learnlike <span style={{ color: 'var(--primary)' }}>LMS</span>
                 </span>

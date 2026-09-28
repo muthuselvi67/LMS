@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../context/NotificationContext';
 import {
   LayoutDashboard,
   BookOpen,
@@ -9,6 +10,7 @@ import {
   TrendingUp,
   Award,
   Download,
+  Bell,
   User,
   Settings,
   LogOut,
@@ -23,6 +25,7 @@ import {
 
 export const StudentSidebar = ({ isOpen, onClose }) => {
   const { logout } = useAuth();
+  const { unreadCount } = useNotifications();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -38,6 +41,7 @@ export const StudentSidebar = ({ isOpen, onClose }) => {
     { label: 'Progress', path: '/progress', icon: TrendingUp },
     { label: 'Certificates', path: '/certificates', icon: Award },
     { label: 'Downloads', path: '/downloads', icon: Download },
+    { label: 'Notifications', path: '/notifications', icon: Bell, badge: unreadCount },
   ];
 
   const secondaryItems = [
@@ -87,9 +91,28 @@ export const StudentSidebar = ({ isOpen, onClose }) => {
                 to={item.path}
                 onClick={onClose}
                 className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+                style={{ justifyContent: 'space-between' }}
               >
-                <Icon size={18} />
-                <span>{item.label}</span>
+                <div className="flex items-center gap-3">
+                  <Icon size={18} />
+                  <span>{item.label}</span>
+                </div>
+                {item.badge > 0 && (
+                  <span
+                    className="sidebar-badge"
+                    style={{
+                      backgroundColor: 'var(--primary)',
+                      color: '#ffffff',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      padding: '0.15rem 0.5rem',
+                      borderRadius: '999px',
+                      lineHeight: 1.2
+                    }}
+                  >
+                    {item.badge}
+                  </span>
+                )}
               </NavLink>
             );
           })}
@@ -129,6 +152,7 @@ export const StudentSidebar = ({ isOpen, onClose }) => {
 
 export const AdminSidebar = ({ isOpen, onClose }) => {
   const { logout } = useAuth();
+  const { unreadCount } = useNotifications();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -146,6 +170,7 @@ export const AdminSidebar = ({ isOpen, onClose }) => {
     { label: 'Enrollments', path: '/admin/enrollments', icon: BookmarkCheck },
     { label: 'Reviews', path: '/admin/reviews', icon: Star },
     { label: 'Certificates', path: '/admin/certificates', icon: Award },
+    { label: 'Notifications', path: '/admin/notifications', icon: Bell, badge: unreadCount },
     { label: 'Settings', path: '/admin/settings', icon: Settings },
   ];
 
@@ -197,9 +222,28 @@ export const AdminSidebar = ({ isOpen, onClose }) => {
                 to={item.path}
                 onClick={onClose}
                 className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+                style={{ justifyContent: 'space-between' }}
               >
-                <Icon size={18} />
-                <span>{item.label}</span>
+                <div className="flex items-center gap-3">
+                  <Icon size={18} />
+                  <span>{item.label}</span>
+                </div>
+                {item.badge > 0 && (
+                  <span
+                    className="sidebar-badge"
+                    style={{
+                      backgroundColor: 'var(--success)',
+                      color: '#ffffff',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      padding: '0.15rem 0.5rem',
+                      borderRadius: '999px',
+                      lineHeight: 1.2
+                    }}
+                  >
+                    {item.badge}
+                  </span>
+                )}
               </NavLink>
             );
           })}

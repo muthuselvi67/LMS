@@ -51,32 +51,38 @@ export const Home = () => {
     {
       icon: BookOpen,
       title: 'Expert Learning Content',
-      desc: 'Structured curricula crafted by industry experts covering fundamental to advanced mastery.'
+      desc: 'Structured curricula crafted by industry experts covering fundamental to advanced mastery.',
+      link: '/courses'
     },
     {
       icon: Layers,
       title: 'Practical Projects',
-      desc: 'Build real-world web apps, databases, and responsive layouts that look great on your portfolio.'
+      desc: 'Build real-world web apps, databases, and responsive layouts that look great on your portfolio.',
+      link: '/courses'
     },
     {
       icon: Download,
       title: 'Downloadable Resources',
-      desc: 'Comprehensive PDF study notes, architecture cheatsheets, and code guides for offline study.'
+      desc: 'Comprehensive PDF study notes, architecture cheatsheets, and code guides for offline study.',
+      link: '/courses'
     },
     {
       icon: TrendingUp,
       title: 'Progress Tracking',
-      desc: 'Real-time granular lesson progress percentage calculation with automated milestone indicators.'
+      desc: 'Real-time granular lesson progress percentage calculation with automated milestone indicators.',
+      link: '/register'
     },
     {
       icon: Award,
       title: 'Verified Certificates',
-      desc: 'Earn official, verifiable Certificates of Completion upon 100% course curriculum completion.'
+      desc: 'Earn official, verifiable Certificates of Completion upon 100% course curriculum completion.',
+      link: '/register'
     },
     {
       icon: Clock,
       title: 'Learn at Your Own Pace',
-      desc: 'Lifetime access to video lessons, quizzes, and resources. Learn anytime, anywhere, on any device.'
+      desc: 'Lifetime access to video lessons, quizzes, and resources. Learn anytime, anywhere, on any device.',
+      link: '/courses'
     }
   ];
 
@@ -345,8 +351,12 @@ export const Home = () => {
                   style={{
                     padding: '2rem',
                     borderRadius: '16px',
-                    transition: 'all 0.25s ease'
+                    transition: 'all 0.25s ease',
+                    cursor: 'pointer'
                   }}
+                  onClick={() => navigate(card.link)}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
                 >
                   <div style={{
                     width: '50px',

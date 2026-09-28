@@ -32,6 +32,74 @@ export const Courses = () => {
   const [price, setPrice] = useState(searchParams.get('price') || 'all');
   const [sort, setSort] = useState(searchParams.get('sort') || 'newest');
 
+
+
+  const [allCoursesList, setAllCoursesList] = useState([]);
+
+  // Fetch baseline list of all courses for computing level and category counts
+  useEffect(() => {
+    const fetchAll = async () => {
+      try {
+        const res = await courseService.getCourses({});
+        if (res.success) setAllCoursesList(res.data);
+      } catch (err) {}
+    };
+    fetchAll();
+  }, []);
+
+  // Compute context-aware category counts based on active level filter
+  const categoryCounts = React.useMemo(() => {
+    const map = { total: 0 };
+    const filteredByLevel = level !== 'all'
+      ? allCoursesList.filter(c => c.level === level || c.level === 'All Levels')
+      : allCoursesList;
+
+    map.total = filteredByLevel.length;
+
+    filteredByLevel.forEach(c => {
+      const slug = c.category_slug;
+      if (slug) {
+        map[slug] = (map[slug] || 0) + 1;
+      }
+    });
+    return map;
+  }, [allCoursesList, level]);
+
+  // Compute context-aware level counts based on active category filter
+  const levelCounts = React.useMemo(() => {
+    const filteredByCat = category !== 'all'
+      ? allCoursesList.filter(c => 
+          c.category_slug === category || 
+          c.category_id == category ||
+          (c.title && c.title.toLowerCase().includes(category.toLowerCase())) ||
+          (c.category_name && c.category_name.toLowerCase().includes(category.toLowerCase()))
+        )
+      : allCoursesList;
+
+    const counts = { Beginner: 0, Intermediate: 0, Advanced: 0, 'All Levels': 0, total: filteredByCat.length };
+    filteredByCat.forEach((c) => {
+      if (counts[c.level] !== undefined) {
+        counts[c.level]++;
+      }
+    });
+    return counts;
+  }, [allCoursesList, category]);
+
+  // Sync filters from URL search params whenever URL changes
+  useEffect(() => {
+    const urlSearch = searchParams.get('search') || '';
+    const urlCategory = searchParams.get('category') || 'all';
+    const urlLevel = searchParams.get('level') || 'all';
+    const urlPrice = searchParams.get('price') || 'all';
+    const urlSort = searchParams.get('sort') || 'newest';
+
+    setSearch(urlSearch);
+    setCategory(urlCategory);
+    setLevel(urlLevel);
+    setPrice(urlPrice);
+    setSort(urlSort);
+  }, [searchParams]);
+
   // Load categories and enrolled courses
   useEffect(() => {
     const fetchInitial = async () => {
@@ -81,9 +149,40 @@ export const Courses = () => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     setSearchParams(prev => {
-      if (search) prev.set('search', search);
-      else prev.delete('search');
-      return prev;
+      const next = new URLSearchParams(prev);
+      if (search.trim()) next.set('search', search.trim());
+      else next.delete('search');
+      return next;
+    });
+  };
+
+  const handleCategoryChange = (val) => {
+    setCategory(val);
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      if (val && val !== 'all') next.set('category', val);
+      else next.delete('category');
+      return next;
+    });
+  };
+
+  const handleLevelChange = (val) => {
+    setLevel(val);
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      if (val && val !== 'all') next.set('level', val);
+      else next.delete('level');
+      return next;
+    });
+  };
+
+  const handleSortChange = (val) => {
+    setSort(val);
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      if (val && val !== 'newest') next.set('sort', val);
+      else next.delete('sort');
+      return next;
     });
   };
 
@@ -123,7 +222,7 @@ export const Courses = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div className="container" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', margin: '10px auto' }}>
       {/* Header Banner */}
       <div>
         <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.35rem' }}>Available Courses</h1>
@@ -164,15 +263,20 @@ export const Courses = () => {
           <div>
             <select
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={(e) => handleCategoryChange(e.target.value)}
               className="form-select"
             >
-              <option value="all">All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.slug}>
-                  {cat.name} ({cat.course_count || 1})
-                </option>
-              ))}
+              <option value="all">
+                All Categories ({categoryCounts.total || 0})
+              </option>
+              {categories.map((cat) => {
+                const count = categoryCounts[cat.slug] || 0;
+                return (
+                  <option key={cat.id} value={cat.slug}>
+                    {cat.name} ({count})
+                  </option>
+                );
+              })}
             </select>
           </div>
 
@@ -180,14 +284,16 @@ export const Courses = () => {
           <div>
             <select
               value={level}
-              onChange={(e) => setLevel(e.target.value)}
+              onChange={(e) => handleLevelChange(e.target.value)}
               className="form-select"
             >
-              <option value="all">All Skill Levels</option>
-              <option value="Beginner">Beginner</option>
-              <option value="Intermediate">Intermediate</option>
-              <option value="Advanced">Advanced</option>
-              <option value="All Levels">All Levels</option>
+              <option value="all">
+                All Skill Levels ({levelCounts.total || 0})
+              </option>
+              <option value="Beginner">Beginner ({levelCounts.Beginner || 0})</option>
+              <option value="Intermediate">Intermediate ({levelCounts.Intermediate || 0})</option>
+              <option value="Advanced">Advanced ({levelCounts.Advanced || 0})</option>
+              <option value="All Levels">Flexible ({levelCounts['All Levels'] || 0})</option>
             </select>
           </div>
 
@@ -195,7 +301,7 @@ export const Courses = () => {
           <div>
             <select
               value={sort}
-              onChange={(e) => setSort(e.target.value)}
+              onChange={(e) => handleSortChange(e.target.value)}
               className="form-select"
             >
               <option value="newest">Sort by: Newest</option>
@@ -211,13 +317,13 @@ export const Courses = () => {
         {(search || category !== 'all' || level !== 'all' || price !== 'all' || sort !== 'newest') && (
           <div className="flex items-center justify-between" style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)', fontSize: '0.85rem' }}>
             <span style={{ color: 'var(--text-muted)' }}>
-              Showing filtered results ({courses.length} courses found)
+              Showing results for {search ? <strong>"{search}"</strong> : 'selected filters'} ({courses.length} courses found)
             </span>
             <button
               onClick={clearAllFilters}
-              style={{ color: 'var(--danger)', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: 600 }}
+              style={{ color: 'var(--danger)', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}
             >
-              <X size={14} /> Clear all filters
+              <X size={14} /> Clear search & filters
             </button>
           </div>
         )}
@@ -229,15 +335,29 @@ export const Courses = () => {
           Loading available courses...
         </div>
       ) : courses.length === 0 ? (
-        <div className="card" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
-          <BookOpen size={40} color="var(--text-light)" style={{ margin: '0 auto 1rem auto' }} />
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem' }}>No Courses Found</h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-            Try adjusting your search criteria or resetting filters.
+        <div className="card" style={{ padding: '3.5rem 2rem', textAlign: 'center' }}>
+          <BookOpen size={44} color="var(--text-light)" style={{ margin: '0 auto 1rem auto' }} />
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem' }}>No Matching Courses Found</h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem', maxWidth: '500px', margin: '0 auto 1.5rem auto' }}>
+            {category !== 'all' && level !== 'all'
+              ? `No ${level} level courses currently available in ${category.toUpperCase()}. Try resetting one of the filters below.`
+              : 'Try adjusting your search criteria or resetting filters.'}
           </p>
-          <button onClick={clearAllFilters} className="btn btn-primary btn-sm">
-            Reset Filters
-          </button>
+          <div className="flex items-center justify-center gap-3" style={{ flexWrap: 'wrap' }}>
+            {category !== 'all' && (
+              <button onClick={() => handleCategoryChange('all')} className="btn btn-secondary btn-sm">
+                View All {level !== 'all' ? level : ''} Courses
+              </button>
+            )}
+            {level !== 'all' && (
+              <button onClick={() => handleLevelChange('all')} className="btn btn-secondary btn-sm">
+                View All {category !== 'all' ? category.toUpperCase() : ''} Courses
+              </button>
+            )}
+            <button onClick={clearAllFilters} className="btn btn-primary btn-sm">
+              Clear All Filters
+            </button>
+          </div>
         </div>
       ) : (
         <div className="course-grid">

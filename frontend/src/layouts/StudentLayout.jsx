@@ -7,6 +7,15 @@ import { useAuth } from '../context/AuthContext';
 export const StudentLayout = () => {
   const { isAuthenticated, loading } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const handleToggleSidebar = () => {
+    if (window.innerWidth >= 1024) {
+      setSidebarCollapsed(prev => !prev);
+    } else {
+      setSidebarOpen(prev => !prev);
+    }
+  };
 
   if (loading) {
     return (
@@ -33,10 +42,10 @@ export const StudentLayout = () => {
   }
 
   return (
-    <div className="lms-layout">
+    <div className={`lms-layout ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       <StudentSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="lms-main">
-        <DashboardNavbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+        <DashboardNavbar onToggleSidebar={handleToggleSidebar} />
         <main className="lms-content">
           <Outlet />
         </main>

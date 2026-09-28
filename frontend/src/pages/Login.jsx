@@ -35,7 +35,7 @@ export const Login = () => {
       if (data.user.role === 'admin') {
         navigate('/admin/dashboard', { replace: true });
       } else {
-        navigate(from === '/login' ? '/dashboard' : from, { replace: true });
+        navigate(from === '/login' ? '/courses' : from, { replace: true });
       }
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Login failed. Please check credentials.');
@@ -63,12 +63,12 @@ export const Login = () => {
     <div style={{
       minHeight: 'calc(100vh - 74px)',
       display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '2rem 1.5rem',
-      backgroundColor: 'var(--bg-main)'
+      flexDirection: 'column',
+      padding: '4rem 1.5rem 2rem 1.5rem',
+      backgroundColor: 'var(--bg-main)',
+      alignItems: 'center'
     }}>
-      <div className="card" style={{ width: '100%', maxWidth: '440px', padding: '2.5rem', borderRadius: '20px' }}>
+      <div className="card" style={{ width: '100%', maxWidth: '440px', padding: '2.5rem', borderRadius: '20px', marginTop: 'auto', marginBottom: 'auto' }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <div style={{
@@ -93,9 +93,9 @@ export const Login = () => {
 
         {/* Error Alert */}
         {error && (
-          <div className="alert alert-danger">
-            <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
-            <div>{error}</div>
+          <div className="alert alert-danger" style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1rem', borderRadius: '8px', background: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', fontSize: '0.875rem' }}>
+            <AlertCircle size={18} style={{ flexShrink: 0 }} />
+            <span>{error}</span>
           </div>
         )}
 

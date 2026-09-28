@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 --  LEARNLIKE LMS - Complete Database Schema + Seed Data
 --  Database: learnlike_lms
 -- ============================================================
@@ -140,10 +140,10 @@ CREATE TABLE IF NOT EXISTS `resources` (
 -- SEED DATA
 -- ============================================================
 
--- Admin  (password: Admin@1234  -> bcrypt hash below is "password" placeholder; replace if needed)
+-- Admin & Student (default password: "password")
 INSERT INTO `users` (`name`, `email`, `password`, `role`) VALUES
-('Admin', 'admin@learnlike.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'),
-('John Student', 'student@learnlike.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student');
+('Admin', 'admin@learnlike.com', '$2a$10$4ZWL8WAXaUyhWcHz3QugYuztay45YMU9laLPkbuRVTshNvcUoV.NS', 'admin'),
+('John Student', 'student@learnlike.com', '$2a$10$4ZWL8WAXaUyhWcHz3QugYuztay45YMU9laLPkbuRVTshNvcUoV.NS', 'student');
 
 -- Categories
 INSERT INTO `categories` (`name`, `slug`, `description`, `icon`) VALUES

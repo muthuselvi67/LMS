@@ -24,7 +24,7 @@ const PORT = process.env.PORT || 5000;
 
 // Enable CORS for frontend
 app.use(cors({
-  origin: '*',
+  origin: true,
   credentials: true
 }));
 

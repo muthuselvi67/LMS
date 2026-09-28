@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { PlayCircle, CheckCircle, ChevronDown, ChevronRight, Lock } from 'lucide-react';
 import { CourseProgress } from './CourseProgress';
 
-export const LessonSidebar = ({ lessons = [], activeLessonId, onSelectLesson, progressData, courseTitle }) => {
+export const LessonSidebar = ({ lessons = [], activeLessonId, onSelectLesson, onToggleComplete, progressData, courseTitle }) => {
   // Group lessons by section_name
   const sections = useMemo(() => {
     const map = {};
@@ -104,9 +104,16 @@ export const LessonSidebar = ({ lessons = [], activeLessonId, onSelectLesson, pr
                     const isDone = completedIds.includes(lesson.id);
 
                     return (
-                      <button
+                      <div
                         key={lesson.id}
                         onClick={() => onSelectLesson(lesson)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            onSelectLesson(lesson);
+                          }
+                        }}
                         style={{
                           width: '100%',
                           padding: '0.75rem 1.25rem',
@@ -121,15 +128,43 @@ export const LessonSidebar = ({ lessons = [], activeLessonId, onSelectLesson, pr
                           borderBottom: 'none',
                           textAlign: 'left',
                           transition: 'background-color 0.15s ease',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
+                          userSelect: 'none'
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flex: 1, minWidth: 0 }}>
-                          {isDone ? (
-                            <CheckCircle size={16} color="var(--success)" style={{ flexShrink: 0 }} />
-                          ) : (
-                            <PlayCircle size={16} color={isActive ? 'var(--primary)' : 'var(--text-light)'} style={{ flexShrink: 0 }} />
-                          )}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (onToggleComplete) {
+                                onToggleComplete(lesson.id);
+                              }
+                            }}
+                            title={isDone ? 'Mark as incomplete' : 'Mark as completed'}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              padding: '2px',
+                              margin: 0,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              borderRadius: '50%',
+                              flexShrink: 0,
+                              transition: 'transform 0.15s ease, opacity 0.15s ease'
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.25)'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                          >
+                            {isDone ? (
+                              <CheckCircle size={18} color="var(--success)" style={{ flexShrink: 0 }} />
+                            ) : (
+                              <PlayCircle size={18} color={isActive ? 'var(--primary)' : 'var(--text-light)'} style={{ flexShrink: 0 }} />
+                            )}
+                          </button>
+
                           <span style={{
                             fontSize: '0.825rem',
                             fontWeight: isActive ? 600 : 400,
@@ -144,7 +179,7 @@ export const LessonSidebar = ({ lessons = [], activeLessonId, onSelectLesson, pr
                         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', flexShrink: 0 }}>
                           {lesson.duration || '10m'}
                         </span>
-                      </button>
+                      </div>
                     );
                   })}
                 </div>

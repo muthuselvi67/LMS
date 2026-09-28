@@ -31,8 +31,9 @@ const getCourses = async (req, res, next) => {
     // Category filter
     if (category && category !== 'all') {
       if (isNaN(category)) {
-        sql += ` AND cat.slug = ?`;
-        params.push(category);
+        const catTerm = `%${category}%`;
+        sql += ` AND (cat.slug = ? OR c.title LIKE ? OR c.description LIKE ?)`;
+        params.push(category, catTerm, catTerm);
       } else {
         sql += ` AND c.category_id = ?`;
         params.push(category);
@@ -41,7 +42,7 @@ const getCourses = async (req, res, next) => {
 
     // Level filter
     if (level && level !== 'all') {
-      sql += ` AND c.level = ?`;
+      sql += ` AND (c.level = ? OR c.level = 'All Levels')`;
       params.push(level);
     }
 
